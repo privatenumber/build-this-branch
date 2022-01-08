@@ -12,7 +12,7 @@ Run in your Git repository from the branch you want to build:
 npx build-this-branch
 ```
 
-> ⚠️ Warning: This command will force-push to the remote branch `built/<current branch>`. Please make sure there are no unsaved changes there. You can configure the built branch name with `--built-branch <branch name>`.
+> **⚠️ Warning:** This command will force-push to the remote branch `built/<current branch>`. Please make sure there are no unsaved changes there. You can configure the built branch name with `--built-branch <branch name>`.
 
 ### Flags
 | Flag | Description |
