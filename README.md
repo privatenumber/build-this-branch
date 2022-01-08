@@ -12,10 +12,7 @@ Run in your Git repository from the branch you want to build:
 npx build-branch
 ```
 
-Run with `--dry` to see what commands would run first:
-```sh
-npx build-branch --dry
-```
+> ⚠️ Warning: This command will force-push to the remote branch `built/<current branch>`. Please make sure there are no unsaved changes there. You can configure the built branch name with `--built-branch <branch name>`.
 
 ### Flags
 | Flag | Description |
