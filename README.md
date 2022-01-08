@@ -1,4 +1,4 @@
-# build-branch
+# build-this-branch
 
 Script to automate creating _built branches_.
 
@@ -9,7 +9,7 @@ Script to automate creating _built branches_.
 Run in your Git repository from the branch you want to build:
 
 ```sh
-npx build-branch
+npx build-this-branch
 ```
 
 > ⚠️ Warning: This command will force-push to the remote branch `built/<current branch>`. Please make sure there are no unsaved changes there. You can configure the built branch name with `--built-branch <branch name>`.

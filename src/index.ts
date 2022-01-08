@@ -6,7 +6,7 @@ import task from 'tasuku';
 import { cli } from 'cleye';
 import packlist from 'npm-packlist';
 import { pkgUp } from 'pkg-up';
-import { version, description } from '../package.json';
+import { name, version, description } from '../package.json';
 
 async function assertCleanTree() {
 	const { stdout } = await execa('git', ['status', '--porcelain', '--untracked-files=no']).catch((error) => {
@@ -48,7 +48,7 @@ const { stringify } = JSON;
 
 (async () => {
 	const argv = cli({
-		name: 'build-branch',
+		name,
 
 		version,
 
@@ -105,7 +105,7 @@ const { stringify } = JSON;
 		console.log('Running in dry mode');
 	}
 
-	const localBuiltBranch = `build-branch/${builtBranch}-${Date.now()}`;
+	const localBuiltBranch = `build-this-branch/${builtBranch}-${Date.now()}`;
 	let success = false;
 	try {
 		let distributionFiles: string[] = [];
