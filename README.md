@@ -1,5 +1,9 @@
 # build-this-branch
 
+<p align="center">
+	<img src=".github/screenshot.png" width="600">
+</p>
+
 Script to automate creating _built branches_.
 
 <sub>Support this project by ⭐️ starring and sharing it. [Follow me](https://github.com/privatenumber) to see what other cool projects I'm working on! ❤️</sub>
@@ -13,6 +17,14 @@ npx build-this-branch
 ```
 
 > **⚠️ Warning:** This command will force-push to the remote branch `built/<current branch>`. Please make sure there are no unsaved changes there. You can configure the built branch name with `--built-branch <branch name>`.
+
+
+### Global install
+If you use this command often, make sure to install it globally so it's on disk:
+
+```sh
+npm install -g build-this-branch
+```
 
 ### Flags
 | Flag | Description |
