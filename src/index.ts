@@ -63,7 +63,7 @@ const { stringify } = JSON;
 				type: String,
 				alias: 'c',
 				placeholder: '<command>',
-				description: 'The command to run to build the branch.',
+				description: 'The command to build the branch.',
 				default: 'npm run build',
 			},
 			remote: {

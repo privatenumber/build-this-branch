@@ -17,9 +17,9 @@ npx build-this-branch
 ### Flags
 | Flag | Description |
 | - | - |
-| `-c, --build-command <command>` | The command to run to build the branch. (default: "npm run build") |
+| `-c, --build-command <command>` | The command to build the branch. (default: `npm run build`) |
 | `-b, --built-branch <branch name>` | The name of the built branch. Defaults to prefixing "built/" to the current branch. |
-| `-r, --remote <remote>` | The remote to push to. (default: "origin") |
+| `-r, --remote <remote>` | The remote to push to. (default: `origin`) |
 | `-d, --dry` | Dry run mode |
 | `-h, --help` | Show help |
 | `-v, --version` | Show version |
