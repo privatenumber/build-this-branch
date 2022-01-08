@@ -40,10 +40,9 @@ Built branches are useful for quickly testing changes and can be preferrable ove
 
 To make a _built branch_, this script does the following:
 
-1. Run `npm run build` (configurable)
+1. Run build script (eg. `npm run build`)
 2. Create a new branch with the `built/` namespace
 2. Detects npm publish files and commits them to the new branch
 4. Force pushes to remote
 5. Deletes local built branch
-6. Gives you the installation command
-
+6. Prints the installation command to install from the built branch
