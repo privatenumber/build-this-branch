@@ -218,7 +218,7 @@ const { stringify } = JSON;
 
 				if (parsedGitUrl) {
 					const [, repo] = parsedGitUrl;
-					setTitle('Successfully built branch! Install with:');
+					setTitle('Successfully built branch! Install with command:');
 					setOutput(`npm i '${repo}#${builtBranch}'`);
 				}
 			}
