@@ -1,7 +1,7 @@
 # build-this-branch
 
 <p align="center">
-	<img src=".github/screenshot.png" width="600">
+	<img src=".github/demo.gif" width="560">
 </p>
 
 Script to automate creating _built branches_.
