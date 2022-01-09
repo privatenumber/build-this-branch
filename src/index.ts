@@ -103,7 +103,9 @@ const { stringify } = JSON;
 
 	await task(
 		`Building branch ${stringify(branchFrom)} → ${stringify(builtBranch)}`,
-		async ({ task, setTitle, setStatus, setOutput }) => {
+		async ({
+			task, setTitle, setStatus, setOutput,
+		}) => {
 			if (dry) {
 				setStatus('Dry run');
 			}
