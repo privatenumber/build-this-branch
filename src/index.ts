@@ -76,7 +76,7 @@ const { stringify } = JSON;
 			dry: {
 				type: Boolean,
 				alias: 'd',
-				description: 'Dry run mode',
+				description: 'Dry run mode. Will not build, commit, or push to the remote.',
 			},
 		},
 
@@ -94,124 +94,136 @@ const { stringify } = JSON;
 	}
 
 	const packageJson = await readJson(packageJsonPath);
-
 	const {
 		builtBranch = `built/${branchFrom}`,
+		buildCommand,
 		remote,
 		dry,
 	} = argv.flags;
 
-	if (dry) {
-		console.log('Running in dry mode');
-	}
-
-	const localBuiltBranch = `build-this-branch/${builtBranch}-${Date.now()}`;
-	let success = false;
-	try {
-		let distributionFiles: string[] = [];
-
-		// In the try-finally block in case it modifies the working tree
-		// On failure, they will be reverted by the hard reset
-		await task('Building branch', async ({ setTitle }) => {
+	await task(
+		`Building branch ${stringify(branchFrom)} → ${stringify(builtBranch)}`,
+		async ({ task, setTitle, setStatus, setOutput }) => {
 			if (dry) {
-				return;
+				setStatus('Dry run');
 			}
 
-			await promisify(childProcess.exec)(argv.flags.buildCommand);
+			const localBuiltBranch = `build-this-branch/${builtBranch}-${Date.now()}`;
+			let success = false;
+			try {
+				let distributionFiles: string[] = [];
 
-			distributionFiles = await packlist();
+				// In the try-finally block in case it modifies the working tree
+				// On failure, they will be reverted by the hard reset
+				const createBuild = await task(`Creating build with ${stringify(buildCommand)}`, async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
 
-			if (distributionFiles.length === 0) {
-				throw new Error('No distribution files found');
-			}
+					await promisify(childProcess.exec)(buildCommand);
 
-			/**
-			 * Remove "prepack" script
-			 * https://github.com/npm/cli/issues/1229#issuecomment-699528830
-			 *
-			 * Upon installing a git dependency, the prepack script is run
-			 * without devdependency installation.
-			 */
-			if (packageJson.scripts && 'prepack' in packageJson.scripts) {
-				delete packageJson.scripts.prepack;
-				await fs.promises.writeFile(packageJsonPath, stringify(packageJson, null, 2));
-			}
+					distributionFiles = await packlist();
 
-			setTitle('Built branch');
-		});
+					if (distributionFiles.length === 0) {
+						throw new Error('No distribution files found');
+					}
 
-		await task(`Checking out branch ${stringify(builtBranch)}`, async ({ setTitle }) => {
-			if (dry) {
-				return;
-			}
+					/**
+					 * Remove "prepack" script
+					 * https://github.com/npm/cli/issues/1229#issuecomment-699528830
+					 *
+					 * Upon installing a git dependency, the prepack script is run
+					 * without devdependency installation.
+					 */
+					if (packageJson.scripts && 'prepack' in packageJson.scripts) {
+						delete packageJson.scripts.prepack;
+						await fs.promises.writeFile(packageJsonPath, stringify(packageJson, null, 2));
+					}
+				});
 
-			await execa('git', ['checkout', '--orphan', localBuiltBranch]);
-
-			// Unstage all files
-			await execa('git', ['reset']);
-
-			setTitle(`Checked out branch ${stringify(builtBranch)}`);
-		});
-
-		const numberOfDistributionFiles = distributionFiles.length.toLocaleString();
-
-		await task(`Commiting ${numberOfDistributionFiles} distribution files`, async ({ setTitle }) => {
-			if (dry) {
-				return;
-			}
-
-			await execa('git', ['add', '-f', ...distributionFiles]);
-			await execa('git', ['commit', '-nm', `Built from ${stringify(branchFrom)}`]);
-
-			setTitle(`Commiting ${numberOfDistributionFiles} distribution files`);
-		});
-
-		await task(
-			`Force pushing branch ${stringify(builtBranch)} to remote ${stringify(remote)}`,
-			async ({ setTitle }) => {
-				if (dry) {
-					return;
+				if (!dry) {
+					createBuild.clear();
 				}
 
-				await execa('git', ['push', '-f', remote, `${localBuiltBranch}:${builtBranch}`]);
+				const checkoutBranch = await task(`Checking out branch ${stringify(builtBranch)}`, async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
 
-				setTitle(`Force pushed branch ${stringify(builtBranch)} to remote ${stringify(remote)}`);
-				success = true;
-			},
-		);
-	} finally {
-		await task(`Reverting branch to ${stringify(branchFrom)}`, async ({ setTitle }) => {
-			if (dry) {
-				return;
+					await execa('git', ['checkout', '--orphan', localBuiltBranch]);
+
+					// Unstage all files
+					await execa('git', ['reset']);
+				});
+
+				if (!dry) {
+					checkoutBranch.clear();
+				}
+
+				const commit = await task('Commiting distribution assets', async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
+
+					await execa('git', ['add', '-f', ...distributionFiles]);
+					await execa('git', ['commit', '-nm', `Built from ${stringify(branchFrom)}`]);
+				});
+
+				if (!dry) {
+					commit.clear();
+				}
+
+				const push = await task(
+					`Force pushing branch ${stringify(builtBranch)} to remote ${stringify(remote)}`,
+					async ({ setWarning }) => {
+						if (dry) {
+							setWarning('');
+							return;
+						}
+
+						await execa('git', ['push', '-f', remote, `${localBuiltBranch}:${builtBranch}`]);
+
+						success = true;
+					},
+				);
+
+				if (!dry) {
+					push.clear();
+				}
+			} finally {
+				const revertBranch = await task(`Switching branch back to ${stringify(branchFrom)}`, async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
+
+					// In case commit failed and there are uncommitted changes
+					await execa('git', ['reset', '--hard']);
+
+					await execa('git', ['checkout', '-f', branchFrom]);
+
+					// Delete local built branch
+					await execa('git', ['branch', '-D', localBuiltBranch]);
+				});
+
+				revertBranch.clear();
 			}
 
-			// In case commit failed and there are uncommitted changes
-			await execa('git', ['reset', '--hard']);
-
-			await execa('git', ['checkout', '-f', branchFrom]);
-
-			// Delete local built branch
-			await execa('git', ['branch', '-D', localBuiltBranch]);
-
-			setTitle(`Reverted branch to ${stringify(branchFrom)}`);
-		});
-	}
-
-	if (success) {
-		await task(
-			'Generating npm install command',
-			async ({ setTitle, setOutput }) => {
+			if (success) {
 				const { stdout } = await execa('git', ['remote', 'get-url', remote]);
 				const parsedGitUrl = stdout.match(/github\.com:(.+)\.git$/);
 
 				if (parsedGitUrl) {
 					const [, repo] = parsedGitUrl;
-					setTitle('Install with command:');
+					setTitle('Success! Install built branch with:');
 					setOutput(`npm i '${repo}#${builtBranch}'`);
 				}
-			},
-		);
-	}
+			}
+		},
+	);
 })().catch((error) => {
 	console.log('Error:', error.message);
 
