@@ -16,7 +16,7 @@ Run in your Git repository from the branch you want to build:
 npx build-this-branch
 ```
 
-> **⚠️ Warning:** This command will force-push to the remote branch `built/<current branch>`. Please make sure there are no unsaved changes there. You can configure the built branch name with `--built-branch <branch name>`.
+> **⚠️ Warning:** This command will force-push to the remote branch `built/<current branch>`. Make sure there are no unsaved changes there. You can configure the built branch name with `--built-branch <branch name>`.
 
 
 ### Global install
@@ -54,7 +54,7 @@ To make a _built branch_, this script does the following:
 
 1. Run build script (eg. `npm run build`)
 2. Create a new branch with the `built/` namespace
-2. Detects npm publish files and commits them to the new branch
-4. Force pushes to remote
+3. [Detects](https://github.com/npm/npm-packlist) and only commits npm publish files to the new branch
+4. Force pushes up to remote
 5. Deletes local built branch
-6. Prints the installation command to install from the built branch
+6. Prints the installation command for the built branch
