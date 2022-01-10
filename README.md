@@ -40,9 +40,10 @@ npm install -g build-this-branch
 
 ### What's a built branch?
 
-In projects that build from source files, a _built branch_ is a branch that contains built assets so it can be installed with [npm](https://docs.npmjs.com/cli/v8/commands/npm-install#:~:text=npm%20install%20%3Cgithubname%3E%2F%3Cgithubrepo%3E%5B%23%3Ccommit-ish%3E%5D):
+In projects that build from source files, a _built branch_ is a branch that contains built assets so it can be installed with [npm](https://docs.npmjs.com/cli/v8/commands/npm-install#:~:text=npm%20install%20%3Cgithubname%3E%2F%3Cgithubrepo%3E%5B%23%3Ccommit-ish%3E%5D) when pushed to GitHub:
 
 ```sh
+# Installs from github.com/organization/repository/tree/built-branch
 npm install 'organization/repository#built-branch'
 ```
 
