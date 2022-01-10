@@ -22,17 +22,33 @@ async function assertCleanTree() {
 	}
 }
 
-async function getCurrentBranchName() {
-	try {
-		const { stdout } = await execa('git', ['symbolic-ref', '--short', '-q', 'HEAD']);
-		return stdout.trim();
-	} catch (error) {
-		if (error instanceof Error) {
-			throw new TypeError(`Failed to get current branch name\n${error.message}`);
-		}
+async function getCurrentBranchOrTagName() {
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	const silenceError = () => {};
 
-		throw error;
+	/**
+	 * This commands supports older versions of Git, but since v2.22, you can do:
+	 * git branch --show-current
+	 */
+	const branch = await execa('git', ['symbolic-ref', '--short', '-q', 'HEAD']).then(
+		({ stdout }) => stdout,
+		silenceError,
+	);
+
+	if (branch) {
+		return branch;
 	}
+
+	const tag = await execa('git', ['describe', '--tags']).then(
+		({ stdout }) => stdout,
+		silenceError,
+	);
+
+	if (tag) {
+		return tag;
+	}
+
+	throw new Error('Failed to get current branch name');
 }
 
 async function readJson(path: string) {
@@ -57,7 +73,7 @@ const { stringify } = JSON;
 				type: String,
 				alias: 'b',
 				placeholder: '<branch name>',
-				description: 'The name of the built branch. Defaults to prefixing "built/" to the current branch.',
+				description: 'The name of the built branch. Defaults to prefixing "built/" to the current branch or tag name.',
 			},
 			buildCommand: {
 				type: String,
@@ -86,7 +102,7 @@ const { stringify } = JSON;
 	});
 
 	await assertCleanTree();
-	const branchFrom = await getCurrentBranchName();
+	const branchFrom = await getCurrentBranchOrTagName();
 	const packageJsonPath = await pkgUp();
 
 	if (!packageJsonPath) {
