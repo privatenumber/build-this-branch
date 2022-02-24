@@ -4,7 +4,7 @@
 	<img src=".github/demo.gif" width="560">
 </p>
 
-Script to automate creating _built branches_.
+Script to automate creating _built branches_ for testing npm packages without publishing them to npm.
 
 <sub>Support this project by ⭐️ starring and sharing it. [Follow me](https://github.com/privatenumber) to see what other cool projects I'm working on! ❤️</sub>
 
@@ -39,8 +39,7 @@ npm install -g build-this-branch
 ## FAQ
 
 ### What's a built branch?
-
-In projects that build from source files, a _built branch_ is a branch that contains built assets so it can be installed with [npm](https://docs.npmjs.com/cli/v8/commands/npm-install#:~:text=npm%20install%20%3Cgithubname%3E%2F%3Cgithubrepo%3E%5B%23%3Ccommit-ish%3E%5D) when pushed to GitHub:
+A _built branch_ is a Git branch that contains published assets so it can be installed with [npm](https://docs.npmjs.com/cli/v8/commands/npm-install#:~:text=npm%20install%20%3Cgithubname%3E%2F%3Cgithubrepo%3E%5B%23%3Ccommit-ish%3E%5D) from GitHub:
 
 ```sh
 # Installs from github.com/organization/repository/tree/built-branch
@@ -49,9 +48,33 @@ npm install 'organization/repository#built-branch'
 
 Built branches are useful for quickly testing changes and can be preferrable over permanently publishing a prerelease to npm.
 
+### When would I use this?
+For testing an npm package without publishing to npm by hosting it on a GitHub branch instead.
+
+Use-cases:
+- When you want to test a new package that isn't ready to be published on npm, and you prefer not to deal with private npm packages.
+- When you're contributing to an open source project, and you want to test the changes.
+- When you want to avoid using `npm link` because of symlink complexities
+- When you can't install locally via `npm install <project path>` or `npm pack` + `npm install <tarball>` (eg. testing in remote environment or providing a shareable test package)
+
+### How is this different from simply committing distribution files to a branch?
+
+You can accomplish something similar by manually running the following commands:
+```
+$ npm run build
+$ git add --force dist
+$ git commit -nam built
+$ git push
+```
+
+However, this will not yield the same exact output as `npm publish`:
+- There might be distribution files outside of `dist` (eg. multiple files at the package root). _build-this-branch_ uses [npm-packlist](https://github.com/npm/npm-packlist) —the same library `npm publish` uses—to detect publish files specified in `package.json#files`.
+- Irrelevant files are committed (eg. source files). This can slow down installation or even interfere with the library behavior. For example, if your project has development configuration files, they can accidentally be read by the dependent.
+
+
 ### What does this script do?
 
-To make a _built branch_, this script does the following:
+This script does the following to make a _built branch_:
 
 1. Run build script (eg. `npm run build`)
 2. Create a new branch with the `built/` namespace
