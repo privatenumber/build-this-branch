@@ -49,13 +49,13 @@ npm install 'organization/repository#built-branch'
 Built branches are useful for quickly testing changes and can be preferrable over permanently publishing a prerelease to npm.
 
 ### When would I use this?
-When you want to test install an npm package by publishing it to a GitHub branch before publishing it to npm.
+When you want to test install an in-development npm package by publishing it to a GitHub branch instead of npm.
 
-> _But you can publish private test packages on npm too!_
+> _But you can prepublish private test packages on npm too!_
 
 Personally, I prefer to use GitHub + Git over npm for testing packages because I'll have more control with better UI/UX.
 
-A _built branch_ is innately impermanent because it constantly gets force-pushed, and the branch can be easily deleted via commandline or GitHub.com. npm requires version bumping every test package and has a strict [Unpublish policy](https://docs.npmjs.com/policies/unpublish).
+A _built branch_ is innately impermanent because it constantly gets force-pushed, and the branch can be easily deleted via commandline or GitHub UI. On top of that, it's easily sharable by link—to install or to look at the source. npm requires version bumping every test package, has a strict [Unpublish policy](https://docs.npmjs.com/policies/unpublish), and does not make it easy to view the code before installing.
 
 Use-cases:
 - When you want to test a new package that isn't ready to be published on npm.
@@ -74,9 +74,8 @@ $ git push
 ```
 
 However, this will not yield the same exact output as `npm publish`:
-- There might be distribution files outside of `dist` (eg. multiple files at the package root). _build-this-branch_ uses [npm-packlist](https://github.com/npm/npm-packlist) —the same library `npm publish` uses—to detect publish files specified in `package.json#files`.
+- There might be distribution files outside of `dist` (eg. multiple files at the package root). _build-this-branch_ uses [npm-packlist](https://github.com/npm/npm-packlist) —the same library `npm publish` uses—to detect publish files dictated by `package.json#files` and `.npmignore`.
 - Irrelevant files are committed (eg. source files). This can slow down installation or even interfere with the library behavior. For example, if your project has development configuration files, they can accidentally be read by the dependent.
-
 
 ### What does this script do?
 
@@ -88,3 +87,11 @@ This script does the following to make a _built branch_:
 4. Force pushes up to remote
 5. Deletes local built branch
 6. Prints the installation command for the built branch
+
+### Can I install from a built branch hosted on a private repository?
+
+If it's being installed from a Git client that's authorized to access the private repository.
+
+However, if you're comfortable publishing the built assets to a public repository (given it's minified, mangled), you can use the `--remote <remote>` flag to push to a public repository.
+
+Use-case: When you want to test a built branch on a private repository, but GitHub CI on the consuming project doesn't have access.
