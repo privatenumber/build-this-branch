@@ -49,13 +49,19 @@ npm install 'organization/repository#built-branch'
 Built branches are useful for quickly testing changes and can be preferrable over permanently publishing a prerelease to npm.
 
 ### When would I use this?
-For testing an npm package without publishing to npm by hosting it on a GitHub branch instead.
+When you want to test install an npm package by publishing it to a GitHub branch before publishing it to npm.
+
+> _But you can publish private test packages on npm too!_
+
+Personally, I prefer to use GitHub + Git over npm for testing packages because I'll have more control with better UI/UX.
+
+A _built branch_ is innately impermanent because it constantly gets force-pushed, and the branch can be easily deleted via commandline or GitHub.com. npm requires version bumping every test package and has a strict [Unpublish policy](https://docs.npmjs.com/policies/unpublish).
 
 Use-cases:
-- When you want to test a new package that isn't ready to be published on npm, and you prefer not to deal with private npm packages.
+- When you want to test a new package that isn't ready to be published on npm.
 - When you're contributing to an open source project, and you want to test the changes.
-- When you want to avoid using `npm link` because of symlink complexities
-- When you can't install locally via `npm install <project path>` or `npm pack` + `npm install <tarball>` (eg. testing in remote environment or providing a shareable test package)
+- When you want to avoid using `npm link` because of symlink complexities.
+- When you can't install locally via `npm install <project path>` or `npm pack` + `npm install <tarball>` (eg. testing in remote environment or providing a shareable test package).
 
 ### How is this different from simply committing distribution files to a branch?
 
