@@ -95,7 +95,7 @@ Yes, if it's being installed from a Git client that's authorized to access the p
 However, if you're comfortable publishing the built assets to a public repository (given it's minified, mangled), you can use the `--remote <remote>` flag to push to another repository that the client has access to (eg. public repository).
 
 #### User story
-You want to test a built branch hosted on a private repository _Repo A_, but GitHub CI on the consuming project _Repo B_ doesn't have access to the private repository.
+You want to test a built branch hosted on a private repository _Repo A_, but GitHub Actions on the consuming project _Repo B_ doesn't have access to the private repository so `npm install` fails.
 
 To work around this, you push the built branch to _Repo B_ to install it from there:
 
