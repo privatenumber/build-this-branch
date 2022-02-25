@@ -73,8 +73,8 @@ $ git commit -nam built
 $ git push
 ```
 
-However, this will not yield the same exact output as `npm publish`:
-- There might be distribution files outside of `dist` (eg. multiple files at the package root). _build-this-branch_ uses [npm-packlist](https://github.com/npm/npm-packlist) —the same library `npm publish` uses—to detect publish files dictated by `package.json#files` and `.npmignore`.
+However, this will not yield the same exact output as `npm publish` because:
+- There can be missing distribution files (eg. multiple files at the package root). _build-this-branch_ uses [npm-packlist](https://github.com/npm/npm-packlist) —the same library `npm publish` uses—to detect publish files specified via `package.json#files` and `.npmignore`.
 - Irrelevant files are committed (eg. source files). This can slow down installation or even interfere with the library behavior. For example, if your project has development configuration files, they can accidentally be read by the dependent.
 
 ### What does this script do?
@@ -90,8 +90,18 @@ This script does the following to make a _built branch_:
 
 ### Can I install from a built branch hosted on a private repository?
 
-If it's being installed from a Git client that's authorized to access the private repository.
+Yes, if it's being installed from a Git client that's authorized to access the private repository.
 
-However, if you're comfortable publishing the built assets to a public repository (given it's minified, mangled), you can use the `--remote <remote>` flag to push to a public repository.
+However, if you're comfortable publishing the built assets to a public repository (given it's minified, mangled), you can use the `--remote <remote>` flag to push to another repository that the client has access to (eg. public repository).
 
-Use-case: When you want to test a built branch on a private repository, but GitHub CI on the consuming project doesn't have access.
+#### User story
+You want to test a built branch hosted on a private repository _Repo A_, but GitHub CI on the consuming project _Repo B_ doesn't have access to the private repository.
+
+To work around this, you push the built branch to _Repo B_ to install it from there:
+
+```sh
+$ npx build-this-branch --remote git@github.com:repo-b.git --branch test-pkg
+
+✔ Successfully built branch! Install with command:
+  → npm i 'repo-b#test-pkg'
+```
