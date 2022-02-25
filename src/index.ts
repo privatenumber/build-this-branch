@@ -231,8 +231,15 @@ const { stringify } = JSON;
 			}
 
 			if (success) {
-				const { stdout } = await execa('git', ['remote', 'get-url', remote]);
-				const parsedGitUrl = stdout.match(/github\.com:(.+)\.git$/);
+				let remoteUrl = remote;
+
+				// If "remote" is a git remote alias, resolve it to the actual remote URL
+				try {
+					const { stdout } = await execa('git', ['remote', 'get-url', remoteUrl]);
+					remoteUrl = stdout.trim();
+				} catch {}
+
+				const parsedGitUrl = remoteUrl.match(/github\.com:(.+)\.git$/);
 
 				if (parsedGitUrl) {
 					const [, repo] = parsedGitUrl;
