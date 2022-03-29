@@ -40,7 +40,7 @@ build-this-branch
 | `-r, --remote <remote>` | The remote to push to. (default: `origin`) |
 | `-d, --dry` | Dry run mode. Will not build, commit, or push to the remote. |
 | `-h, --help` | Show help |
-| `-v, --version` | Show version |
+| `--version` | Show version |
 
 ## FAQ
 
