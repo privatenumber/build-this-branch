@@ -10,7 +10,7 @@ Script to automate creating _built branches_ for testing npm packages without pu
 
 ## Usage
 
-Run in your Git repository from the branch you want to build:
+Run in your npm package Git repository from the branch you want to build:
 
 ```sh
 npx build-this-branch
@@ -59,7 +59,7 @@ When you want to test-install an in-development npm package by publishing it to 
 
 > _But you can prepublish private test packages on npm too!_
 
-Personally, I prefer to use GitHub + Git over npm for testing packages because I'll have more control with better UI/UX.
+Personally, I prefer to use GitHub + Git over npm for testing packages because I'll have more control with better "prepublish" management.
 
 A _built branch_ is impermanent because it constantly gets force-pushed, and the branch can be easily deleted via commandline or GitHub UI. On top of that, it's easily sharable by link—to install or to look at the source.
 
@@ -112,4 +112,15 @@ $ npx build-this-branch --remote git@github.com:repo-b.git --branch test-pkg
 
 ✔ Successfully built branch! Install with command:
   → npm i 'repo-b#test-pkg'
+```
+
+### Is it possible to use for packages that don't have a build step?
+
+Yes. _build-this-branch_ can be useful for packages that don't have a build step because it filters out non-publish files.
+
+Creating a banch only with publish files will make bring the testing environment closer to the publish environment.
+
+To use in a project without a build step, pass in an empty build command:
+```
+$ npx build-this-branch -c
 ```

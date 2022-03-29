@@ -54,7 +54,7 @@
 	"eslintConfig": {
 		"extends": "@pvtnbr",
 		"rules": {
-			"@typescript-eslint/no-shadow": ["error", { "allow": ["task"] }]
+			"@typescript-eslint/no-shadow": ["error", { "allow": ["task", "setTitle"] }]
 		}
 	}
 }

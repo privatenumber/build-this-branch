@@ -129,22 +129,53 @@ const { stringify } = JSON;
 			const localBuiltBranch = `build-this-branch/${builtBranch}-${Date.now()}`;
 			let success = false;
 			try {
-				let distributionFiles: string[] = [];
+				let publishFiles: string[] = [];
 
 				// In the try-finally block in case it modifies the working tree
 				// On failure, they will be reverted by the hard reset
-				const createBuild = await task(`Creating build with ${stringify(buildCommand)}`, async ({ setWarning }) => {
+				const createBuild = await task(`Creating build with ${stringify(buildCommand)}`, async ({ setWarning, setTitle }) => {
+					if (!buildCommand) {
+						setTitle('No build command passed in. Skipping build.');
+
+						if (dry) {
+							setWarning('');
+						}
+						return;
+					}
+
 					if (dry) {
 						setWarning('');
 						return;
 					}
 
 					await promisify(childProcess.exec)(buildCommand);
+				});
 
-					distributionFiles = await packlist();
+				if (!dry) {
+					createBuild.clear();
+				}
 
-					if (distributionFiles.length === 0) {
-						throw new Error('No distribution files found');
+				const getPublishFiles = await task('Getting publish files', async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
+
+					publishFiles = await packlist();
+
+					if (publishFiles.length === 0) {
+						throw new Error('No publish files found');
+					}
+				});
+
+				if (!dry) {
+					getPublishFiles.clear();
+				}
+
+				const removePrepack = await task('Removing prepack script', async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
 					}
 
 					/**
@@ -161,7 +192,7 @@ const { stringify } = JSON;
 				});
 
 				if (!dry) {
-					createBuild.clear();
+					removePrepack.clear();
 				}
 
 				const checkoutBranch = await task(`Checking out branch ${stringify(builtBranch)}`, async ({ setWarning }) => {
@@ -186,7 +217,7 @@ const { stringify } = JSON;
 						return;
 					}
 
-					await execa('git', ['add', '-f', ...distributionFiles]);
+					await execa('git', ['add', '-f', ...publishFiles]);
 					await execa('git', ['commit', '-nm', `Built from ${stringify(branchFrom)}`]);
 				});
 
