@@ -172,11 +172,18 @@ const { stringify } = JSON;
 					getPublishFiles.clear();
 				}
 
-				const removePrepack = await task('Removing prepack script', async ({ setWarning }) => {
+				const removePrepack = await task('Removing prepack & prepare scripts', async ({ setWarning }) => {
 					if (dry) {
 						setWarning('');
 						return;
 					}
+
+					if (!('scripts' in packageJson)) {
+						return;
+					}
+
+					const { scripts } = packageJson;
+					let mutated = false;
 
 					/**
 					 * Remove "prepack" script
@@ -185,9 +192,30 @@ const { stringify } = JSON;
 					 * Upon installing a git dependency, the prepack script is run
 					 * without devdependency installation.
 					 */
-					if (packageJson.scripts && 'prepack' in packageJson.scripts) {
-						delete packageJson.scripts.prepack;
-						await fs.promises.writeFile(packageJsonPath, stringify(packageJson, null, 2));
+					if ('prepack' in scripts) {
+						delete scripts.prepack;
+						mutated = true;
+					}
+
+					/**
+					 * npm uses "prepare" script for git dependencies
+					 * because its usually unbuilt.
+					 *
+					 * Since build-this-branch prebuilds the package, it should
+					 * be removed.
+					 *
+					 * https://docs.npmjs.com/cli/v8/using-npm/scripts#:~:text=NOTE%3A%20If%20a%20package%20being%20installed%20through%20git%20contains%20a%20prepare%20script%2C%20its%20dependencies%20and%20devDependencies%20will%20be%20installed%2C%20and%20the%20prepare%20script%20will%20be%20run%2C%20before%20the%20package%20is%20packaged%20and%20installed.
+					 */
+					if ('prepare' in scripts) {
+						delete scripts.prepare;
+						mutated = true;
+					}
+
+					if (mutated) {
+						await fs.promises.writeFile(
+							packageJsonPath,
+							stringify(packageJson, null, 2),
+						);
 					}
 				});
 
