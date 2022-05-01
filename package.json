@@ -23,7 +23,7 @@
 	],
 	"bin": "./dist/index.js",
 	"scripts": {
-		"build": "pkgroll --minify",
+		"build": "pkgroll --target node12.19 --minify",
 		"lint": "eslint .",
 		"postversion": "npm run build"
 	},
