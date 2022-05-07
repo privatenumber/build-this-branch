@@ -4,7 +4,7 @@
 	<img src=".github/demo.gif" width="560">
 </p>
 
-Script to automate creating _built branches_ for testing npm packages without publishing them to npm.
+Script to automate creating [_built branches_](#whats-a-built-branch) for testing npm packages without publishing them to npm.
 
 <sub>Support this project by ⭐️ starring and sharing it. [Follow me](https://github.com/privatenumber) to see what other cool projects I'm working on! ❤️</sub>
 
