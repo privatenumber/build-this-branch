@@ -65,5 +65,8 @@
 				}
 			]
 		}
+	},
+	"dependencies": {
+		"yoga-layout-prebuilt": "^1.10.0"
 	}
 }

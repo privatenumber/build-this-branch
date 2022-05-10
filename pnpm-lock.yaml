@@ -15,6 +15,10 @@ specifiers:
   tasuku: ^2.0.0
   tsup: ^5.12.7
   typescript: ^4.6.4
+  yoga-layout-prebuilt: ^1.10.0
+
+dependencies:
+  yoga-layout-prebuilt: 1.10.0
 
 devDependencies:
   '@pvtnbr/eslint-config': 0.22.0_hcfsmds2fshutdssjqluwm76uu
@@ -277,7 +281,6 @@ packages:
 
   /@types/yoga-layout/1.9.2:
     resolution: {integrity: sha512-S9q47ByT2pPvD65IvrWp7qppVMpk9WGMbVq9wbWZOHg6tnXSD4vyhao6nOSBwwfDdV2p3Kx9evA9vI+XWTfDvw==}
-    dev: true
 
   /@typescript-eslint/eslint-plugin/5.23.0_c63nfttrfhylg3zmgcxfslaw44:
     resolution: {integrity: sha512-hEcSmG4XodSLiAp1uxv/OQSGsDY6QN3TcRU32gANp+19wGE1QQZLRS8/GV58VRUoXhnkuJ3ZxNQ3T6Z6zM59DA==}
@@ -3484,4 +3487,3 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       '@types/yoga-layout': 1.9.2
-    dev: true
