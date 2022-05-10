@@ -24,7 +24,7 @@
 	],
 	"bin": "dist/index.js",
 	"scripts": {
-		"build": "pkgroll --minify",
+		"build": "pkgroll",
 		"lint": "eslint .",
 		"postversion": "npm run build"
 	},
