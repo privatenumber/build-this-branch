@@ -24,7 +24,7 @@
 	],
 	"bin": "dist/index.js",
 	"scripts": {
-		"build": "pkgroll",
+		"build": "pkgroll --target=node12.19",
 		"lint": "eslint .",
 		"postversion": "npm run build"
 	},
