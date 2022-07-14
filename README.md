@@ -85,16 +85,19 @@ However, this will not yield the same exact output as `npm publish` because:
 - There can be missing distribution files (eg. files outside of `dist`). _build-this-branch_ uses [npm-packlist](https://github.com/npm/npm-packlist) —the same library `npm publish` uses—to detect publish files declared via `package.json#files` and `.npmignore`.
 - Irrelevant files are committed (eg. source files). This can slow down installation or even interfere with the library behavior. For example, if your project has development configuration files, they can accidentally be read by the dependent tooling.
 
+- npm hooks are not executed. _build-this-branch_ simulates package packing and runs hooks `prepare` and `prepack`.
+
 ### What exactly does this script do?
 
 This script does the following to make a _built branch_:
 
 1. Run build script (eg. `npm run build`)
-2. Create a new branch with the `built/` namespace
-3. [Detects](https://github.com/npm/npm-packlist) and only commits npm publish files to the new branch
-4. Force pushes up to remote
-5. Deletes local built branch
-6. Prints the installation command for the built branch
+2. Run "prepare" & "prepack" [npm hooks](https://docs.npmjs.com/cli/v8/using-npm/scripts)
+3. Create a new branch with the `built/` namespace
+4. [Detects](https://github.com/npm/npm-packlist) and only commits npm publish files to the new branch
+5. Force pushes up to remote
+6. Deletes local built branch
+7. Prints the installation command for the built branch
 
 ### Can I install from a built branch hosted on a private repository?
 

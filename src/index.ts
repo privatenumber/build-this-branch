@@ -109,7 +109,6 @@ const { stringify } = JSON;
 		throw new Error('No package.json found');
 	}
 
-	const packageJson = await readJson(packageJsonPath);
 	const {
 		builtBranch = `built/${branchFrom}`,
 		buildCommand,
@@ -172,30 +171,37 @@ const { stringify } = JSON;
 					getPublishFiles.clear();
 				}
 
-				const removePrepack = await task('Removing prepack & prepare scripts', async ({ setWarning }) => {
+				const runHooks = await task('Running hooks', async ({ setWarning, setTitle }) => {
 					if (dry) {
 						setWarning('');
 						return;
 					}
 
+					setTitle('Running hook "prepare"');
+					await execa('npm', ['run', '--if-present', 'prepare']);
+
+					setTitle('Running hook "prepack"');
+					await execa('npm', ['run', '--if-present', 'prepack']);
+				});
+
+				if (!dry) {
+					runHooks.clear();
+				}
+
+				const removeHooks = await task('Removing "prepare" & "prepack" hooks', async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
+
+					// Re-read incase hooks modified the package.json
+					const packageJson = await readJson(packageJsonPath);
 					if (!('scripts' in packageJson)) {
 						return;
 					}
 
 					const { scripts } = packageJson;
 					let mutated = false;
-
-					/**
-					 * Remove "prepack" script
-					 * https://github.com/npm/cli/issues/1229#issuecomment-699528830
-					 *
-					 * Upon installing a git dependency, the prepack script is run
-					 * without devdependency installation.
-					 */
-					if ('prepack' in scripts) {
-						delete scripts.prepack;
-						mutated = true;
-					}
 
 					/**
 					 * npm uses "prepare" script for git dependencies
@@ -211,6 +217,18 @@ const { stringify } = JSON;
 						mutated = true;
 					}
 
+					/**
+					 * Remove "prepack" script
+					 * https://github.com/npm/cli/issues/1229#issuecomment-699528830
+					 *
+					 * Upon installing a git dependency, the prepack script is run
+					 * without devdependency installation.
+					 */
+					if ('prepack' in scripts) {
+						delete scripts.prepack;
+						mutated = true;
+					}
+
 					if (mutated) {
 						await fs.promises.writeFile(
 							packageJsonPath,
@@ -220,7 +238,7 @@ const { stringify } = JSON;
 				});
 
 				if (!dry) {
-					removePrepack.clear();
+					removeHooks.clear();
 				}
 
 				const checkoutBranch = await task(`Checking out branch ${stringify(builtBranch)}`, async ({ setWarning }) => {
