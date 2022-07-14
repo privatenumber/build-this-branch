@@ -92,7 +92,7 @@ However, this will not yield the same exact output as `npm publish` because:
 This script does the following to make a _built branch_:
 
 1. Run build script (eg. `npm run build`)
-2. Run "prepare" & "prepack" [npm hooks](https://docs.npmjs.com/cli/v8/using-npm/scripts)
+2. Run `prepare` & `prepack` [npm hooks](https://docs.npmjs.com/cli/v8/using-npm/scripts)
 3. Create a new branch with the `built/` namespace
 4. [Detects npm publish files](https://github.com/npm/npm-packlist) and commits them to the new branch
 5. Force pushes up to remote
