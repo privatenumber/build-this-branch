@@ -28,14 +28,6 @@
 		"lint": "eslint .",
 		"postversion": "npm run build"
 	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
-	"lint-staged": {
-		"*.{js,ts}": "eslint"
-	},
 	"dependencies": {
 		"yoga-layout-prebuilt": "^1.10.0"
 	},
@@ -46,8 +38,6 @@
 		"cleye": "^1.2.0",
 		"eslint": "^8.15.0",
 		"execa": "^6.1.0",
-		"husky": "^4.0.0",
-		"lint-staged": "^12.4.1",
 		"npm-packlist": "^5.0.3",
 		"pkg-up": "^4.0.0",
 		"pkgroll": "^1.2.2",
