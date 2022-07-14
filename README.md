@@ -92,11 +92,12 @@ However, this will not yield the same exact output as `npm publish` because:
 This script does the following to make a _built branch_:
 
 1. Run build script (eg. `npm run build`)
-2. Create a new branch with the `built/` namespace
-3. [Detects](https://github.com/npm/npm-packlist) and only commits npm publish files to the new branch
-4. Force pushes up to remote
-5. Deletes local built branch
-6. Prints the installation command for the built branch
+2. Run "prepare" & "prepack" [npm hooks](https://docs.npmjs.com/cli/v8/using-npm/scripts)
+3. Create a new branch with the `built/` namespace
+4. [Detects](https://github.com/npm/npm-packlist) and only commits npm publish files to the new branch
+5. Force pushes up to remote
+6. Deletes local built branch
+7. Prints the installation command for the built branch
 
 ### Can I install from a built branch hosted on a private repository?
 
