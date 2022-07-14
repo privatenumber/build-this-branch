@@ -85,6 +85,8 @@ However, this will not yield the same exact output as `npm publish` because:
 - There can be missing distribution files (eg. files outside of `dist`). _build-this-branch_ uses [npm-packlist](https://github.com/npm/npm-packlist) —the same library `npm publish` uses—to detect publish files declared via `package.json#files` and `.npmignore`.
 - Irrelevant files are committed (eg. source files). This can slow down installation or even interfere with the library behavior. For example, if your project has development configuration files, they can accidentally be read by the dependent tooling.
 
+- npm hooks are not executed. _build-this-branch_ simulates package packing and runs hooks `prepare` and `prepack`.
+
 ### What exactly does this script do?
 
 This script does the following to make a _built branch_:

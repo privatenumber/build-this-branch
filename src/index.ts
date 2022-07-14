@@ -172,7 +172,7 @@ const { stringify } = JSON;
 					getPublishFiles.clear();
 				}
 
-				const removePrepack = await task('Removing prepack & prepare scripts', async ({ setWarning }) => {
+				const runHooks = await task('Running hooks', async ({ setWarning, setTitle }) => {
 					if (dry) {
 						setWarning('');
 						return;
@@ -186,18 +186,6 @@ const { stringify } = JSON;
 					let mutated = false;
 
 					/**
-					 * Remove "prepack" script
-					 * https://github.com/npm/cli/issues/1229#issuecomment-699528830
-					 *
-					 * Upon installing a git dependency, the prepack script is run
-					 * without devdependency installation.
-					 */
-					if ('prepack' in scripts) {
-						delete scripts.prepack;
-						mutated = true;
-					}
-
-					/**
 					 * npm uses "prepare" script for git dependencies
 					 * because its usually unbuilt.
 					 *
@@ -207,7 +195,25 @@ const { stringify } = JSON;
 					 * https://docs.npmjs.com/cli/v8/using-npm/scripts#:~:text=NOTE%3A%20If%20a%20package%20being%20installed%20through%20git%20contains%20a%20prepare%20script%2C%20its%20dependencies%20and%20devDependencies%20will%20be%20installed%2C%20and%20the%20prepare%20script%20will%20be%20run%2C%20before%20the%20package%20is%20packaged%20and%20installed.
 					 */
 					if ('prepare' in scripts) {
+						setTitle('Running hook "prepare"');
+						await execa('npm', ['run', 'prepare']);
+						setTitle('Running hooks');
 						delete scripts.prepare;
+						mutated = true;
+					}
+
+					/**
+					 * Remove "prepack" script
+					 * https://github.com/npm/cli/issues/1229#issuecomment-699528830
+					 *
+					 * Upon installing a git dependency, the prepack script is run
+					 * without devdependency installation.
+					 */
+					if ('prepack' in scripts) {
+						setTitle('Running hook "prepack"');
+						await execa('npm', ['run', 'prepack']);
+						setTitle('Running hooks');
+						delete scripts.prepack;
 						mutated = true;
 					}
 
@@ -220,7 +226,7 @@ const { stringify } = JSON;
 				});
 
 				if (!dry) {
-					removePrepack.clear();
+					runHooks.clear();
 				}
 
 				const checkoutBranch = await task(`Checking out branch ${stringify(builtBranch)}`, async ({ setWarning }) => {
