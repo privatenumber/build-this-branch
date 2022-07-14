@@ -109,7 +109,6 @@ const { stringify } = JSON;
 		throw new Error('No package.json found');
 	}
 
-	const packageJson = await readJson(packageJsonPath);
 	const {
 		builtBranch = `built/${branchFrom}`,
 		buildCommand,
@@ -178,6 +177,25 @@ const { stringify } = JSON;
 						return;
 					}
 
+					setTitle('Running hook "prepare"');
+					await execa('npm', ['run', '--if-present', 'prepare']);
+
+					setTitle('Running hook "prepack"');
+					await execa('npm', ['run', '--if-present', 'prepack']);
+				});
+
+				if (!dry) {
+					runHooks.clear();
+				}
+
+				const removeHooks = await task('Removing "prepare" & "prepack" hooks', async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
+
+					// Re-read incase hooks modified the package.json
+					const packageJson = await readJson(packageJsonPath);
 					if (!('scripts' in packageJson)) {
 						return;
 					}
@@ -195,9 +213,6 @@ const { stringify } = JSON;
 					 * https://docs.npmjs.com/cli/v8/using-npm/scripts#:~:text=NOTE%3A%20If%20a%20package%20being%20installed%20through%20git%20contains%20a%20prepare%20script%2C%20its%20dependencies%20and%20devDependencies%20will%20be%20installed%2C%20and%20the%20prepare%20script%20will%20be%20run%2C%20before%20the%20package%20is%20packaged%20and%20installed.
 					 */
 					if ('prepare' in scripts) {
-						setTitle('Running hook "prepare"');
-						await execa('npm', ['run', 'prepare']);
-						setTitle('Running hooks');
 						delete scripts.prepare;
 						mutated = true;
 					}
@@ -210,9 +225,6 @@ const { stringify } = JSON;
 					 * without devdependency installation.
 					 */
 					if ('prepack' in scripts) {
-						setTitle('Running hook "prepack"');
-						await execa('npm', ['run', 'prepack']);
-						setTitle('Running hooks');
 						delete scripts.prepack;
 						mutated = true;
 					}
@@ -226,7 +238,7 @@ const { stringify } = JSON;
 				});
 
 				if (!dry) {
-					runHooks.clear();
+					removeHooks.clear();
 				}
 
 				const checkoutBranch = await task(`Checking out branch ${stringify(builtBranch)}`, async ({ setWarning }) => {
