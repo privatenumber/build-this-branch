@@ -154,23 +154,6 @@ const { stringify } = JSON;
 					createBuild.clear();
 				}
 
-				const getPublishFiles = await task('Getting publish files', async ({ setWarning }) => {
-					if (dry) {
-						setWarning('');
-						return;
-					}
-
-					publishFiles = await packlist();
-
-					if (publishFiles.length === 0) {
-						throw new Error('No publish files found');
-					}
-				});
-
-				if (!dry) {
-					getPublishFiles.clear();
-				}
-
 				const runHooks = await task('Running hooks', async ({ setWarning, setTitle }) => {
 					if (dry) {
 						setWarning('');
@@ -186,6 +169,23 @@ const { stringify } = JSON;
 
 				if (!dry) {
 					runHooks.clear();
+				}
+
+				const getPublishFiles = await task('Getting publish files', async ({ setWarning }) => {
+					if (dry) {
+						setWarning('');
+						return;
+					}
+
+					publishFiles = await packlist();
+
+					if (publishFiles.length === 0) {
+						throw new Error('No publish files found');
+					}
+				});
+
+				if (!dry) {
+					getPublishFiles.clear();
 				}
 
 				const removeHooks = await task('Removing "prepare" & "prepack" hooks', async ({ setWarning }) => {
