@@ -1,3 +1,7 @@
+> **⚠️ This package has been deprecated!**
+>
+> You can use the successor [`git-publish`](https://github.com/privatenumber/git-publish) instead.
+
 # build-this-branch
 
 <p align="center">
